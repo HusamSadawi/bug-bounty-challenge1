@@ -92,6 +92,23 @@ const commonTheme = {
         "@font-face": fonts
       }
     }
+  },
+  components: {
+    MuiSelect: {
+      color: "primary",
+      styleOverrides: {
+        icon: ({ theme }: any) => ({
+          color: theme.palette.common.white
+        })
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme }: any) => ({
+          color: theme.palette.common.white
+        })
+      }
+    }
   }
 };
 

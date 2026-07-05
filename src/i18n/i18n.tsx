@@ -5,6 +5,7 @@ import de from "./locales/de.json";
 import en from "./locales/en.json";
 
 export const FALLBACK_LANGUAGE = "en";
+const LANGUAGE_STORAGE_KEY = "app_language";
 
 export interface Language {
   locale: string;
@@ -27,6 +28,24 @@ export const defaultTranslationModules = [
 ];
 export const defaultLanguages = defaultTranslationModules.map((m) => m.locale);
 
+const getStoredLanguage = () => {
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return storedLanguage && defaultLanguages.includes(storedLanguage)
+    ? storedLanguage
+    : undefined;
+};
+
+const getInitialLanguage = () => {
+  const storedLanguage = getStoredLanguage();
+  if (storedLanguage) {
+    return storedLanguage;
+  }
+
+  return defaultLanguages.includes(browserLanguage)
+    ? browserLanguage
+    : FALLBACK_LANGUAGE;
+};
+
 const resources = cloneDeep(
   Object.fromEntries(
     defaultTranslationModules.map((m) => [m.locale, { app: m.texts }])
@@ -43,11 +62,17 @@ i18n
     resources,
     ns: ["common", "app"],
     defaultNS: "app",
-    lng: FALLBACK_LANGUAGE || browserLanguage,
+    lng: getInitialLanguage(),
     fallbackLng: FALLBACK_LANGUAGE,
     interpolation: {
       escapeValue: false // not needed for react as it escapes by default
     }
   });
+
+i18n.on("languageChanged", (language) => {
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  }
+});
 
 export default i18n;
